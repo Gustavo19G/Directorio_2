@@ -109,8 +109,10 @@ def main():
     
     # Filtrado de datos
     if not mostrar_todos:
-        mask_nombre = busqueda_nombre and df["Nombre"].str.contains(busqueda_nombre, case=False)
-        mask_sucursal = busqueda_sucursal and df["Sucursal"].str.contains(busqueda_sucursal, case=False)
+        mask_nombre = busqueda_nombre.strip() != "" and df["Nombre"].str.contains(busqueda_nombre, case=False, na=False)
+        mask_sucursal = busqueda_sucursal.strip() != "" and df["Sucursal"].str.contains(busqueda_sucursal, case=False, na=False)
+        
+        # Combinar las máscaras
         mask = mask_nombre | mask_sucursal
         df_filtrado = df[mask].copy() if mask.any() else pd.DataFrame(columns=df.columns)
     else:
