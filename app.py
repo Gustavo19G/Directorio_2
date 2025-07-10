@@ -74,44 +74,41 @@ with st.sidebar:
 # Cargar datos iniciales
 df = cargar_datos()
 
-# Buscador
-col1, col2 = st.columns([3, 1])
+# Buscadores separados
+st.header("Buscar Contactos")
+col1, col2 = st.columns(2)
+
 with col1:
-    query = st.text_input("Buscar contacto:", placeholder="Nombre o sucursal...")
+    nombre_query = st.text_input("Buscar por Nombre:", placeholder="Nombre...")
 
 with col2:
-    st.markdown("")
-    st.markdown("")
-    if st.button("Limpiar búsqueda"):
-        query = ""
+    sucursal_query = st.text_input("Buscar por Sucursal:", placeholder="Sucursal...")
 
 # Mostrar resultados
 st.markdown("---")
 
-if query:
-    query = query.lower()
-    filtro = df[
-        df["Nombre"].str.lower().str.contains(query) |
-        df["Sucursal"].str.lower().str.contains(query)
-    ]
-    
-    if filtro.empty:
-        st.warning("No se encontraron coincidencias")
-    else:
-        st.dataframe(
-            filtro,
-            use_container_width=True,
-            hide_index=True,
-            column_config={
-                "Nombre": "Nombre",
-                "Correo Electrónico": "Correo",
-                "Sucursal": "Sucursal",
-                "Extensión": "Extensión"
-            }
-        )
+# Filtrar por nombre
+if nombre_query:
+    nombre_query = nombre_query.lower()
+    filtro_nombre = df[df["Nombre"].str.lower().str.contains(nombre_query)]
+else:
+    filtro_nombre = pd.DataFrame(columns=df.columns)
+
+# Filtrar por sucursal
+if sucursal_query:
+    sucursal_query = sucursal_query.lower()
+    filtro_sucursal = df[df["Sucursal"].str.lower().str.contains(sucursal_query)]
+else:
+    filtro_sucursal = pd.DataFrame(columns=df.columns)
+
+# Combinar resultados
+filtro_combined = pd.concat([filtro_nombre, filtro_sucursal]).drop_duplicates()
+
+if filtro_combined.empty:
+    st.warning("No se encontraron coincidencias")
 else:
     st.dataframe(
-        df,
+        filtro_combined,
         use_container_width=True,
         hide_index=True,
         column_config={
