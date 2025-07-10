@@ -63,7 +63,7 @@ def main():
     with col1:
         st.title("📞 Directorio Telefónico Tamex")
     with col2:
-        st.image("tamex.png", width=100)  # Asegúrate de tener tamex.png en la misma carpeta
+        st.image("tamex.png", width=200)  # Asegúrate de tener tamex.png en la misma carpeta
 
     st.markdown("---")
     
