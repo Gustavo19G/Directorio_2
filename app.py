@@ -2,13 +2,11 @@ import streamlit as st
 import pandas as pd
 import os
 
-
 st.set_page_config(
     page_title="Directorio Telefónico Tamex",
     page_icon="📞",
     layout="wide"
 )
-
 
 @st.cache_data
 def cargar_datos():
@@ -40,7 +38,6 @@ def cargar_datos():
         st.error(f"Error al cargar el archivo: {str(e)}")
         return pd.DataFrame(columns=["Nombre", "Correo Electrónico", "Sucursal", "Extensión"])
 
-
 def guardar_datos(df):
     try:
         df.to_excel(
@@ -56,7 +53,6 @@ def guardar_datos(df):
         st.error(f"Error al guardar el archivo: {str(e)}")
         return False
 
-
 def main():
 
     col1, col2 = st.columns([0.8, 0.2])
@@ -66,10 +62,8 @@ def main():
         st.image("tamex.png", width=200)
 
     st.markdown("---")
-    
 
     df = cargar_datos()
-    
 
     with st.sidebar:
         st.header("Actualización de Datos")
@@ -85,9 +79,11 @@ def main():
                 type="password",
                 help="Ingrese la contraseña para realizar cambios"
             )
-            
+
+            admin_password = st.secrets["auth"]["admin_password"]
+
             if st.button("Actualizar Directorio"):
-                if password == "admin123":
+                if password == admin_password:
                     if uploaded_file is not None:
                         try:
                             new_df = pd.read_excel(uploaded_file, engine="openpyxl")
@@ -99,18 +95,15 @@ def main():
                         st.warning("Por favor seleccione un archivo")
                 else:
                     st.error("Contraseña incorrecta")
-    
 
     busqueda_nombre = st.text_input("Buscar por nombre:")
     busqueda_sucursal = st.text_input("Buscar por sucursal:")
-    
 
     mask = (
         df["Nombre"].str.contains(busqueda_nombre, case=False) &
         df["Sucursal"].str.contains(busqueda_sucursal, case=False)
     )
     df_filtrado = df[mask].copy()
-    
 
     st.dataframe(
         df_filtrado,
