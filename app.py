@@ -1,68 +1,136 @@
 import streamlit as st
 import pandas as pd
+import os
 
-# Cambiar el ícono de la pestaña
-st.set_page_config(page_title="Directorio Telefónico Tamex", page_icon="📞")
+# Configuración de la página
+st.set_page_config(
+    page_title="Directorio Telefónico Tamex",
+    page_icon="📞",
+    layout="wide"
+)
 
-# Cargar el archivo Excel
+# Función para cargar datos con validación robusta
 @st.cache_data
 def cargar_datos():
     try:
-        df = pd.read_excel("Directorio2.xlsx", sheet_name="Base de datos", engine="openpyxl")
+        # Verificar si el archivo existe
+        if not os.path.exists("Directorio2.xlsx"):
+            st.error("Archivo 'Directorio2.xlsx' no encontrado")
+            return pd.DataFrame(columns=["Nombre", "Correo Electrónico", "Sucursal", "Extensión"])
+        
+        # Leer el archivo con múltiples validaciones
+        df = pd.read_excel(
+            "Directorio2.xlsx",
+            sheet_name="Base de datos",
+            engine="openpyxl",
+            dtype=str
+        )
+        
+        # Validar columnas requeridas
+        required_columns = ["Nombre", "Correo Electrónico", "Sucursal", "Extensión"]
+        if not all(col in df.columns for col in required_columns):
+            st.error(f"El archivo debe contener estas columnas: {', '.join(required_columns)}")
+            return pd.DataFrame(columns=required_columns)
+        
+        # Eliminar filas completamente vacías
+        df = df.dropna(how='all')
+        
         if df.empty:
-            st.warning("El archivo está vacío.")
-        return df
+            st.warning("El archivo está vacío o no contiene datos válidos")
+            
+        return df.fillna("")
+    
     except Exception as e:
-        st.error(f"No se pudo cargar el archivo Excel: {e}")
-        return pd.DataFrame(columns=["Nombre", "Correo Electrónico", "Sucursal", "Extensión"])
+        st.error(f"Error al cargar el archivo: {str(e)}")
+        return pd.DataFrame(columns=required_columns)
 
-df = cargar_datos()
+# Función para guardar datos
+def guardar_datos(df):
+    try:
+        df.to_excel(
+            "Directorio2.xlsx",
+            index=False,
+            sheet_name="Base de datos",
+            engine="openpyxl"
+        )
+        st.success("Archivo actualizado correctamente")
+        st.cache_data.clear()  # Limpiar caché para recargar datos
+        return True
+    except Exception as e:
+        st.error(f"Error al guardar el archivo: {str(e)}")
+        return False
 
-# Título
-st.title("Directorio Telefónico Tamex")
-
-# Buscador
-query = st.text_input("Buscar por nombre o sucursal:")
-
-# Filtrado
-if query:
-    filtro = df[
-        df["Nombre"].str.lower().str.contains(query.lower()) |
-        df["Sucursal"].str.lower().str.contains(query.lower())
-    ]
-    if filtro.empty:
-        st.warning("No se encontraron coincidencias.")
-    else:
-        st.dataframe(filtro)
-else:
-    st.dataframe(df)
-
-# Sección para actualizar el archivo Excel en una barra desplegable
-with st.expander("Actualizar Archivo Excel"):
-    # Cargar nuevo archivo
-    uploaded_file = st.file_uploader("Cargar nuevo archivo Excel", type=["xlsx"])
-
-    # Solicitar contraseña
-    password = st.text_input("Ingrese la contraseña para actualizar el archivo:", type="password")
-
-    # Verificar la contraseña y actualizar el archivo
-    if st.button("Actualizar"):
-        if password == "tu_contraseña_secreta":  # Cambia esto por la contraseña que desees
-            if uploaded_file is not None:
-                try:
-                    # Leer el nuevo archivo
-                    new_data = pd.read_excel(uploaded_file, engine="openpyxl")
-                    if new_data.empty:
-                        st.warning("El archivo cargado está vacío.")
+# Interfaz principal
+def main():
+    st.title("📞 Directorio Telefónico Tamex")
+    st.markdown("---")
+    
+    # Cargar datos
+    df = cargar_datos()
+    
+    # Barra lateral para actualización
+    with st.sidebar:
+        st.header("Actualización de Datos")
+        with st.expander("Subir nuevo archivo"):
+            uploaded_file = st.file_uploader(
+                "Seleccione archivo Excel",
+                type=["xlsx"],
+                help="El archivo debe contener las columnas requeridas"
+            )
+            
+            password = st.text_input(
+                "Contraseña de administrador:",
+                type="password",
+                help="Ingrese la contraseña para realizar cambios"
+            )
+            
+            if st.button("Actualizar Directorio"):
+                if password == "admin123":  # Cambiar por tu contraseña segura
+                    if uploaded_file is not None:
+                        try:
+                            new_df = pd.read_excel(uploaded_file, engine="openpyxl")
+                            if guardar_datos(new_df):
+                                df = cargar_datos()  # Recargar datos
+                        except Exception as e:
+                            st.error(f"Error al procesar archivo: {str(e)}")
                     else:
-                        # Guardar el nuevo archivo
-                        new_data.to_excel("Directorio2.xlsx", index=False, sheet_name="Base de datos", engine="openpyxl")
-                        st.success("El archivo se ha actualizado correctamente.")
-                        # Recargar los datos después de la actualización
-                        df = cargar_datos()  # Recargar los datos para reflejar los cambios
-                except Exception as e:
-                    st.error(f"No se pudo actualizar el archivo: {e}")
-            else:
-                st.warning("Por favor, carga un archivo Excel.")
-        else:
-            st.error("Contraseña incorrecta.")
+                        st.warning("Por favor seleccione un archivo")
+                else:
+                    st.error("Contraseña incorrecta")
+    
+    # Sección de búsqueda
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        busqueda = st.text_input("Buscar por nombre o sucursal:", key="busqueda")
+    
+    with col2:
+        mostrar_todos = st.checkbox("Mostrar todos los registros", True)
+    
+    # Filtrado de datos
+    if not mostrar_todos and busqueda:
+        mask = (
+            df["Nombre"].str.contains(busqueda, case=False) |
+            df["Sucursal"].str.contains(busqueda, case=False)
+        )
+        df_filtrado = df[mask].copy()
+    else:
+        df_filtrado = df.copy()
+    
+    # Mostrar resultados
+    st.dataframe(
+        df_filtrado,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Nombre": "Nombre",
+            "Correo Electrónico": "Email",
+            "Sucursal": "Sucursal",
+            "Extensión": st.column_config.NumberColumn(
+                "Extensión",
+                format="%d"
+            )
+        }
+    )
+
+if __name__ == "__main__":
+    main()
