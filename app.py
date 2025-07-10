@@ -13,12 +13,10 @@ st.set_page_config(
 @st.cache_data
 def cargar_datos():
     try:
-        # Verificar si el archivo existe
         if not os.path.exists("Directorio2.xlsx"):
             st.error("Archivo 'Directorio2.xlsx' no encontrado")
             return pd.DataFrame(columns=["Nombre", "Correo Electrónico", "Sucursal", "Extensión"])
         
-        # Leer el archivo con múltiples validaciones
         df = pd.read_excel(
             "Directorio2.xlsx",
             sheet_name="Base de datos",
@@ -26,13 +24,11 @@ def cargar_datos():
             dtype=str
         )
         
-        # Validar columnas requeridas
         required_columns = ["Nombre", "Correo Electrónico", "Sucursal", "Extensión"]
         if not all(col in df.columns for col in required_columns):
             st.error(f"El archivo debe contener estas columnas: {', '.join(required_columns)}")
             return pd.DataFrame(columns=required_columns)
         
-        # Eliminar filas completamente vacías
         df = df.dropna(how='all')
         
         if df.empty:
@@ -44,7 +40,6 @@ def cargar_datos():
         st.error(f"Error al cargar el archivo: {str(e)}")
         return pd.DataFrame(columns=required_columns)
 
-# Función para guardar datos
 def guardar_datos(df):
     try:
         df.to_excel(
@@ -54,15 +49,25 @@ def guardar_datos(df):
             engine="openpyxl"
         )
         st.success("Archivo actualizado correctamente")
-        st.cache_data.clear()  # Limpiar caché para recargar datos
+        st.cache_data.clear()
         return True
     except Exception as e:
         st.error(f"Error al guardar el archivo: {str(e)}")
         return False
 
-# Interfaz principal
 def main():
-    st.title("📞 Directorio Telefónico Tamex")
+    # Encabezado con título e imagen
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.title("📞 Directorio Telefónico Tamex")
+    with col2:
+        st.image(
+            "https://placehold.co/200x100/3a86ff/FFFFFF?text=Tamex+Logo",
+            width=200,
+            caption="Logo Tamex",
+            use_column_width=False
+        )
+    
     st.markdown("---")
     
     # Cargar datos
@@ -85,12 +90,12 @@ def main():
             )
             
             if st.button("Actualizar Directorio"):
-                if password == "admin123":  # Cambiar por tu contraseña segura
+                if password == "admin123":
                     if uploaded_file is not None:
                         try:
                             new_df = pd.read_excel(uploaded_file, engine="openpyxl")
                             if guardar_datos(new_df):
-                                df = cargar_datos()  # Recargar datos
+                                df = cargar_datos()
                         except Exception as e:
                             st.error(f"Error al procesar archivo: {str(e)}")
                     else:
