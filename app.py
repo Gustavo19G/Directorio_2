@@ -9,10 +9,12 @@ st.set_page_config(page_title="Directorio Telefónico Tamex", page_icon="📞")
 def cargar_datos():
     try:
         df = pd.read_excel("Directorio2.xlsx", sheet_name="Base de datos", engine="openpyxl")
+        if df.empty:
+            st.warning("El archivo está vacío.")
+        return df
     except Exception as e:
         st.error(f"No se pudo cargar el archivo Excel: {e}")
-        df = pd.DataFrame(columns=["Nombre", "Correo Electrónico", "Sucursal", "Extensión"])
-    return df
+        return pd.DataFrame(columns=["Nombre", "Correo Electrónico", "Sucursal", "Extensión"])
 
 df = cargar_datos()
 
@@ -50,9 +52,14 @@ with st.expander("Actualizar Archivo Excel"):
                 try:
                     # Leer el nuevo archivo
                     new_data = pd.read_excel(uploaded_file, engine="openpyxl")
-                    # Guardar el nuevo archivo
-                    new_data.to_excel("Directorio2.xlsx", index=False, sheet_name="Base de datos", engine="openpyxl")
-                    st.success("El archivo se ha actualizado correctamente.")
+                    if new_data.empty:
+                        st.warning("El archivo cargado está vacío.")
+                    else:
+                        # Guardar el nuevo archivo
+                        new_data.to_excel("Directorio2.xlsx", index=False, sheet_name="Base de datos", engine="openpyxl")
+                        st.success("El archivo se ha actualizado correctamente.")
+                        # Recargar los datos después de la actualización
+                        df = cargar_datos()  # Recargar los datos para reflejar los cambios
                 except Exception as e:
                     st.error(f"No se pudo actualizar el archivo: {e}")
             else:
