@@ -99,22 +99,15 @@ def main():
                     st.error("Contraseña incorrecta")
     
     # Sección de búsqueda
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        busqueda = st.text_input("Buscar por nombre o sucursal:", key="busqueda")
-    
-    with col2:
-        mostrar_todos = st.checkbox("Mostrar todos los registros", True)
+    busqueda_nombre = st.text_input("Buscar por nombre:")
+    busqueda_sucursal = st.text_input("Buscar por sucursal:")
     
     # Filtrado de datos
-    if not mostrar_todos and busqueda:
-        mask = (
-            df["Nombre"].str.contains(busqueda, case=False) |
-            df["Sucursal"].str.contains(busqueda, case=False)
-        )
-        df_filtrado = df[mask].copy()
-    else:
-        df_filtrado = df.copy()
+    mask = (
+        df["Nombre"].str.contains(busqueda_nombre, case=False) &
+        df["Sucursal"].str.contains(busqueda_sucursal, case=False)
+    )
+    df_filtrado = df[mask].copy()
     
     # Mostrar resultados
     st.dataframe(
