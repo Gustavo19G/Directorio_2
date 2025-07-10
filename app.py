@@ -9,7 +9,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# Función para cargar datos con validación robusta
 @st.cache_data
 def cargar_datos():
     try:
@@ -30,10 +29,6 @@ def cargar_datos():
             return pd.DataFrame(columns=required_columns)
         
         df = df.dropna(how='all')
-        
-        if df.empty:
-            st.warning("El archivo está vacío o no contiene datos válidos")
-            
         return df.fillna("")
     
     except Exception as e:
@@ -61,47 +56,49 @@ def main():
     
     df = cargar_datos()
     
-    # Barra lateral para actualización (ahora colapsada por defecto)
-    with st.sidebar:
-        st.header("Actualización de Datos")
-        
-        # Expandable container que inicia colapsado
-        with st.expander("Subir nuevo archivo", expanded=False):
-            uploaded_file = st.file_uploader(
-                "Seleccione archivo Excel",
-                type=["xlsx"],
-                help="El archivo debe contener las columnas requeridas"
-            )
-            
-            password = st.text_input(
-                "Contraseña de administrador:",
-                type="password",
-                help="Ingrese la contraseña para realizar cambios"
-            )
-            
-            if st.button("Actualizar Directorio"):
-                if password == "admin123":
-                    if uploaded_file is not None:
-                        try:
-                            new_df = pd.read_excel(uploaded_file, engine="openpyxl")
-                            if guardar_datos(new_df):
-                                df = cargar_datos()
-                        except Exception as e:
-                            st.error(f"Error al procesar archivo: {str(e)}")
-                    else:
-                        st.warning("Por favor seleccione un archivo")
-                else:
-                    st.error("Contraseña incorrecta")
+    # Usamos st.empty() para inicializar un espacio reservado vacío
+    update_section = st.sidebar.empty()
     
-    # Sección de búsqueda (sin cambios)
+    # Creamos un checkbox como interruptor para mostrar/ocultar la sección
+    show_update = st.sidebar.checkbox("Mostrar panel de actualización", False)
+    
+    if show_update:
+        with update_sidebar.container():
+            st.header("Actualización de Datos")
+            
+            with st.expander("Subir nuevo archivo"):
+                uploaded_file = st.file_uploader(
+                    "Seleccione archivo Excel",
+                    type=["xlsx"]
+                )
+                
+                password = st.text_input(
+                    "Contraseña de administrador:",
+                    type="password"
+                )
+                
+                if st.button("Actualizar Directorio"):
+                    if password == "admin123":
+                        if uploaded_file is not None:
+                            try:
+                                new_df = pd.read_excel(uploaded_file, engine="openpyxl")
+                                if guardar_datos(new_df):
+                                    df = cargar_datos()
+                            except Exception as e:
+                                st.error(f"Error al procesar archivo: {str(e)}")
+                        else:
+                            st.warning("Por favor seleccione un archivo")
+                    else:
+                        st.error("Contraseña incorrecta")
+
+    # Resto del código sin cambios
     col1, col2 = st.columns(2)
     with col1:
-        busqueda_nombre = st.text_input("Buscar por nombre:", key="busqueda_nombre")
+        busqueda_nombre = st.text_input("Buscar por nombre:")
     
     with col2:
-        busqueda_sucursal = st.text_input("Buscar por sucursal:", key="busqueda_sucursal")
+        busqueda_sucursal = st.text_input("Buscar por sucursal:")
     
-    # Filtrado de datos (sin cambios)
     if "Nombre" in df.columns and "Sucursal" in df.columns:
         mask_nombre = pd.Series(False, index=df.index)
         mask_sucursal = pd.Series(False, index=df.index)
@@ -113,13 +110,9 @@ def main():
             mask_sucursal = df["Sucursal"].str.contains(busqueda_sucursal, case=False, na=False)
         
         mask = mask_nombre | mask_sucursal
-        
-        if busqueda_nombre.strip() == "" and busqueda_sucursal.strip() == "":
-            df_filtrado = df.copy()
-        else:
-            df_filtrado = df[mask].copy()
+        df_filtrado = df[mask].copy() if not mask.empty else pd.DataFrame(columns=df.columns)
     else:
-        st.error("Las columnas 'Nombre' y 'Sucursal' no están disponibles en los datos.")
+        st.error("Faltan columnas requeridas en los datos")
         df_filtrado = pd.DataFrame(columns=df.columns)
     
     st.dataframe(
