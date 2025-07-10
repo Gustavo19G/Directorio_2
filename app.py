@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
+from PIL import Image  # Importar para manejo de imágenes
 
 # Configuración de la página
 st.set_page_config(
@@ -9,64 +10,41 @@ st.set_page_config(
     layout="wide"
 )
 
-# Función para cargar datos con validación robusta
-@st.cache_data
-def cargar_datos():
-    try:
-        if not os.path.exists("Directorio2.xlsx"):
-            st.error("Archivo 'Directorio2.xlsx' no encontrado")
-            return pd.DataFrame(columns=["Nombre", "Correo Electrónico", "Sucursal", "Extensión"])
-        
-        df = pd.read_excel(
-            "Directorio2.xlsx",
-            sheet_name="Base de datos",
-            engine="openpyxl",
-            dtype=str
-        )
-        
-        required_columns = ["Nombre", "Correo Electrónico", "Sucursal", "Extensión"]
-        if not all(col in df.columns for col in required_columns):
-            st.error(f"El archivo debe contener estas columnas: {', '.join(required_columns)}")
-            return pd.DataFrame(columns=required_columns)
-        
-        df = df.dropna(how='all')
-        
-        if df.empty:
-            st.warning("El archivo está vacío o no contiene datos válidos")
-            
-        return df.fillna("")
-    
-    except Exception as e:
-        st.error(f"Error al cargar el archivo: {str(e)}")
-        return pd.DataFrame(columns=required_columns)
+# Ruta del logo
+LOGO_PATH = "tamex.png"  # Asegúrate de que el archivo esté en la misma carpeta
 
-def guardar_datos(df):
+# Función para cargar el logo con manejo de errores
+def load_logo(path):
     try:
-        df.to_excel(
-            "Directorio2.xlsx",
-            index=False,
-            sheet_name="Base de datos",
-            engine="openpyxl"
-        )
-        st.success("Archivo actualizado correctamente")
-        st.cache_data.clear()
-        return True
+        return Image.open(path)
     except Exception as e:
-        st.error(f"Error al guardar el archivo: {str(e)}")
-        return False
+        st.error(f"No se pudo cargar el logo: {str(e)}")
+        return None
 
 def main():
     # Encabezado con título e imagen
     col1, col2 = st.columns([3, 1])
+    
     with col1:
         st.title("📞 Directorio Telefónico Tamex")
+    
     with col2:
-        st.image(
-            "https://placehold.co/200x100/3a86ff/FFFFFF?text=Tamex+Logo",
-            width=200,
-            caption="Logo Tamex",
-            use_column_width=False
-        )
+        logo = load_logo(LOGO_PATH)
+        if logo:
+            st.image(
+                logo,
+                width=200,  # Ajusta según necesidad
+                caption="",
+                use_column_width=False
+            )
+        else:
+            # Placeholder alternativo si no se carga el logo
+            st.image(
+                "https://placehold.co/200x100/3a86ff/FFFFFF?text=Logo+Tamex",
+                width=200,
+                caption="Logo no encontrado",
+                use_column_width=False
+            )
     
     st.markdown("---")
     
