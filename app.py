@@ -99,29 +99,36 @@ def main():
                     st.error("Contraseña incorrecta")
     
     # Sección de búsqueda
-    col1, col2 = st.columns([3, 1])
+    col1, col2 = st.columns(2)
     with col1:
         busqueda_nombre = st.text_input("Buscar por nombre:", key="busqueda_nombre")
-        busqueda_sucursal = st.text_input("Buscar por sucursal:", key="busqueda_sucursal")
     
     with col2:
-        mostrar_todos = st.checkbox("Mostrar todos los registros", True)
+        busqueda_sucursal = st.text_input("Buscar por sucursal:", key="busqueda_sucursal")
     
     # Filtrado de datos
-    if not mostrar_todos:
-        # Verificar que las columnas existan antes de aplicar la búsqueda
-        if "Nombre" in df.columns and "Sucursal" in df.columns:
-            mask_nombre = busqueda_nombre.strip() != "" and df["Nombre"].str.contains(busqueda_nombre, case=False, na=False)
-            mask_sucursal = busqueda_sucursal.strip() != "" and df["Sucursal"].str.contains(busqueda_sucursal, case=False, na=False)
-            
-            # Combinar las máscaras
-            mask = mask_nombre | mask_sucursal
-            df_filtrado = df[mask].copy() if mask.any() else pd.DataFrame(columns=df.columns)
+    if "Nombre" in df.columns and "Sucursal" in df.columns:
+        # Crear máscaras iniciales como Series de False con el mismo índice que df
+        mask_nombre = pd.Series(False, index=df.index)
+        mask_sucursal = pd.Series(False, index=df.index)
+        
+        if busqueda_nombre.strip() != "":
+            mask_nombre = df["Nombre"].str.contains(busqueda_nombre, case=False, na=False)
+        
+        if busqueda_sucursal.strip() != "":
+            mask_sucursal = df["Sucursal"].str.contains(busqueda_sucursal, case=False, na=False)
+        
+        # Combinar las máscaras: muestra registros que coincidan con nombre O sucursal
+        mask = mask_nombre | mask_sucursal
+        
+        # Si no hay términos de búsqueda, mostrar todo
+        if busqueda_nombre.strip() == "" and busqueda_sucursal.strip() == "":
+            df_filtrado = df.copy()
         else:
-            st.error("Las columnas 'Nombre' y 'Sucursal' no están disponibles en los datos.")
-            df_filtrado = pd.DataFrame(columns=df.columns)
+            df_filtrado = df[mask].copy()
     else:
-        df_filtrado = df.copy()
+        st.error("Las columnas 'Nombre' y 'Sucursal' no están disponibles en los datos.")
+        df_filtrado = pd.DataFrame(columns=df.columns)
     
     # Mostrar resultados
     st.dataframe(
