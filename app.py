@@ -109,12 +109,17 @@ def main():
     
     # Filtrado de datos
     if not mostrar_todos:
-        mask_nombre = busqueda_nombre.strip() != "" and df["Nombre"].str.contains(busqueda_nombre, case=False, na=False)
-        mask_sucursal = busqueda_sucursal.strip() != "" and df["Sucursal"].str.contains(busqueda_sucursal, case=False, na=False)
-        
-        # Combinar las máscaras
-        mask = mask_nombre | mask_sucursal
-        df_filtrado = df[mask].copy() if mask.any() else pd.DataFrame(columns=df.columns)
+        # Verificar que las columnas existan antes de aplicar la búsqueda
+        if "Nombre" in df.columns and "Sucursal" in df.columns:
+            mask_nombre = busqueda_nombre.strip() != "" and df["Nombre"].str.contains(busqueda_nombre, case=False, na=False)
+            mask_sucursal = busqueda_sucursal.strip() != "" and df["Sucursal"].str.contains(busqueda_sucursal, case=False, na=False)
+            
+            # Combinar las máscaras
+            mask = mask_nombre | mask_sucursal
+            df_filtrado = df[mask].copy() if mask.any() else pd.DataFrame(columns=df.columns)
+        else:
+            st.error("Las columnas 'Nombre' y 'Sucursal' no están disponibles en los datos.")
+            df_filtrado = pd.DataFrame(columns=df.columns)
     else:
         df_filtrado = df.copy()
     
