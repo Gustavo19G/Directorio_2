@@ -101,18 +101,18 @@ def main():
     # Sección de búsqueda
     col1, col2 = st.columns([3, 1])
     with col1:
-        busqueda = st.text_input("Buscar por nombre o sucursal:", key="busqueda")
+        busqueda_nombre = st.text_input("Buscar por nombre:", key="busqueda_nombre")
+        busqueda_sucursal = st.text_input("Buscar por sucursal:", key="busqueda_sucursal")
     
     with col2:
         mostrar_todos = st.checkbox("Mostrar todos los registros", True)
     
     # Filtrado de datos
-    if not mostrar_todos and busqueda:
-        mask = (
-            df["Nombre"].str.contains(busqueda, case=False) |
-            df["Sucursal"].str.contains(busqueda, case=False)
-        )
-        df_filtrado = df[mask].copy()
+    if not mostrar_todos:
+        mask_nombre = busqueda_nombre and df["Nombre"].str.contains(busqueda_nombre, case=False)
+        mask_sucursal = busqueda_sucursal and df["Sucursal"].str.contains(busqueda_sucursal, case=False)
+        mask = mask_nombre | mask_sucursal
+        df_filtrado = df[mask].copy() if mask.any() else pd.DataFrame(columns=df.columns)
     else:
         df_filtrado = df.copy()
     
