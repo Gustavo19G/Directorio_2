@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 
+# Cambiar el ícono de la pestaña
+st.set_page_config(page_title="Directorio Telefónico Tamex", page_icon="📞")
+
 # Cargar el archivo Excel
 @st.cache_data
 def cargar_datos():
@@ -32,28 +35,27 @@ if query:
 else:
     st.dataframe(df)
 
-# Sección para actualizar el archivo Excel
-st.header("Actualizar Archivo Excel")
+# Sección para actualizar el archivo Excel en una barra desplegable
+with st.expander("Actualizar Archivo Excel"):
+    # Cargar nuevo archivo
+    uploaded_file = st.file_uploader("Cargar nuevo archivo Excel", type=["xlsx"])
 
-# Cargar nuevo archivo
-uploaded_file = st.file_uploader("Cargar nuevo archivo Excel", type=["xlsx"])
+    # Solicitar contraseña
+    password = st.text_input("Ingrese la contraseña para actualizar el archivo:", type="password")
 
-# Solicitar contraseña
-password = st.text_input("Ingrese la contraseña para actualizar el archivo:", type="password")
-
-# Verificar la contraseña y actualizar el archivo
-if st.button("Actualizar"):
-    if password == "tu_contraseña_secreta":  # Cambia esto por la contraseña que desees
-        if uploaded_file is not None:
-            try:
-                # Leer el nuevo archivo
-                new_data = pd.read_excel(uploaded_file, engine="openpyxl")
-                # Guardar el nuevo archivo
-                new_data.to_excel("Directorio2.xlsx", index=False, sheet_name="Base de datos", engine="openpyxl")
-                st.success("El archivo se ha actualizado correctamente.")
-            except Exception as e:
-                st.error(f"No se pudo actualizar el archivo: {e}")
+    # Verificar la contraseña y actualizar el archivo
+    if st.button("Actualizar"):
+        if password == "tu_contraseña_secreta":  # Cambia esto por la contraseña que desees
+            if uploaded_file is not None:
+                try:
+                    # Leer el nuevo archivo
+                    new_data = pd.read_excel(uploaded_file, engine="openpyxl")
+                    # Guardar el nuevo archivo
+                    new_data.to_excel("Directorio2.xlsx", index=False, sheet_name="Base de datos", engine="openpyxl")
+                    st.success("El archivo se ha actualizado correctamente.")
+                except Exception as e:
+                    st.error(f"No se pudo actualizar el archivo: {e}")
+            else:
+                st.warning("Por favor, carga un archivo Excel.")
         else:
-            st.warning("Por favor, carga un archivo Excel.")
-    else:
-        st.error("Contraseña incorrecta.")
+            st.error("Contraseña incorrecta.")
