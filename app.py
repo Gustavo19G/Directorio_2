@@ -13,12 +13,10 @@ st.set_page_config(
 @st.cache_data
 def cargar_datos():
     try:
-        # Verificar si el archivo existe
         if not os.path.exists("Directorio2.xlsx"):
             st.error("Archivo 'Directorio2.xlsx' no encontrado")
             return pd.DataFrame(columns=["Nombre", "Correo Electrónico", "Sucursal", "Extensión"])
         
-        # Leer el archivo con múltiples validaciones
         df = pd.read_excel(
             "Directorio2.xlsx",
             sheet_name="Base de datos",
@@ -26,13 +24,11 @@ def cargar_datos():
             dtype=str
         )
         
-        # Validar columnas requeridas
         required_columns = ["Nombre", "Correo Electrónico", "Sucursal", "Extensión"]
         if not all(col in df.columns for col in required_columns):
             st.error(f"El archivo debe contener estas columnas: {', '.join(required_columns)}")
             return pd.DataFrame(columns=required_columns)
         
-        # Eliminar filas completamente vacías
         df = df.dropna(how='all')
         
         if df.empty:
@@ -44,7 +40,6 @@ def cargar_datos():
         st.error(f"Error al cargar el archivo: {str(e)}")
         return pd.DataFrame(columns=required_columns)
 
-# Función para guardar datos
 def guardar_datos(df):
     try:
         df.to_excel(
@@ -54,24 +49,24 @@ def guardar_datos(df):
             engine="openpyxl"
         )
         st.success("Archivo actualizado correctamente")
-        st.cache_data.clear()  # Limpiar caché para recargar datos
+        st.cache_data.clear()
         return True
     except Exception as e:
         st.error(f"Error al guardar el archivo: {str(e)}")
         return False
 
-# Interfaz principal
 def main():
     st.title("📞 Directorio Telefónico Tamex")
     st.markdown("---")
     
-    # Cargar datos
     df = cargar_datos()
     
-    # Barra lateral para actualización
+    # Barra lateral para actualización (ahora colapsada por defecto)
     with st.sidebar:
         st.header("Actualización de Datos")
-        with st.expander("Subir nuevo archivo"):
+        
+        # Expandable container que inicia colapsado
+        with st.expander("Subir nuevo archivo", expanded=False):
             uploaded_file = st.file_uploader(
                 "Seleccione archivo Excel",
                 type=["xlsx"],
@@ -85,12 +80,12 @@ def main():
             )
             
             if st.button("Actualizar Directorio"):
-                if password == "admin123":  # Cambiar por tu contraseña segura
+                if password == "admin123":
                     if uploaded_file is not None:
                         try:
                             new_df = pd.read_excel(uploaded_file, engine="openpyxl")
                             if guardar_datos(new_df):
-                                df = cargar_datos()  # Recargar datos
+                                df = cargar_datos()
                         except Exception as e:
                             st.error(f"Error al procesar archivo: {str(e)}")
                     else:
@@ -98,7 +93,7 @@ def main():
                 else:
                     st.error("Contraseña incorrecta")
     
-    # Sección de búsqueda
+    # Sección de búsqueda (sin cambios)
     col1, col2 = st.columns(2)
     with col1:
         busqueda_nombre = st.text_input("Buscar por nombre:", key="busqueda_nombre")
@@ -106,9 +101,8 @@ def main():
     with col2:
         busqueda_sucursal = st.text_input("Buscar por sucursal:", key="busqueda_sucursal")
     
-    # Filtrado de datos
+    # Filtrado de datos (sin cambios)
     if "Nombre" in df.columns and "Sucursal" in df.columns:
-        # Crear máscaras iniciales como Series de False con el mismo índice que df
         mask_nombre = pd.Series(False, index=df.index)
         mask_sucursal = pd.Series(False, index=df.index)
         
@@ -118,10 +112,8 @@ def main():
         if busqueda_sucursal.strip() != "":
             mask_sucursal = df["Sucursal"].str.contains(busqueda_sucursal, case=False, na=False)
         
-        # Combinar las máscaras: muestra registros que coincidan con nombre O sucursal
         mask = mask_nombre | mask_sucursal
         
-        # Si no hay términos de búsqueda, mostrar todo
         if busqueda_nombre.strip() == "" and busqueda_sucursal.strip() == "":
             df_filtrado = df.copy()
         else:
@@ -130,7 +122,6 @@ def main():
         st.error("Las columnas 'Nombre' y 'Sucursal' no están disponibles en los datos.")
         df_filtrado = pd.DataFrame(columns=df.columns)
     
-    # Mostrar resultados
     st.dataframe(
         df_filtrado,
         use_container_width=True,
