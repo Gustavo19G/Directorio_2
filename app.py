@@ -2,14 +2,14 @@ import streamlit as st
 import pandas as pd
 import os
 
-# Configuración de la página
+
 st.set_page_config(
     page_title="Directorio Telefónico Tamex",
     page_icon="📞",
     layout="wide"
 )
 
-# Función para cargar datos con validación robusta
+
 @st.cache_data
 def cargar_datos():
     try:
@@ -40,7 +40,7 @@ def cargar_datos():
         st.error(f"Error al cargar el archivo: {str(e)}")
         return pd.DataFrame(columns=["Nombre", "Correo Electrónico", "Sucursal", "Extensión"])
 
-# Función para guardar datos
+
 def guardar_datos(df):
     try:
         df.to_excel(
@@ -56,21 +56,21 @@ def guardar_datos(df):
         st.error(f"Error al guardar el archivo: {str(e)}")
         return False
 
-# Interfaz principal
+
 def main():
-    # Título y logo
+
     col1, col2 = st.columns([0.8, 0.2])
     with col1:
         st.title("📞 Directorio Telefónico Tamex")
     with col2:
-        st.image("tamex.png", width=200)  # Asegúrate de tener tamex.png en la misma carpeta
+        st.image("tamex.png", width=200)
 
     st.markdown("---")
     
-    # Cargar datos
+
     df = cargar_datos()
     
-    # Barra lateral para actualización
+
     with st.sidebar:
         st.header("Actualización de Datos")
         with st.expander("Subir nuevo archivo"):
@@ -100,18 +100,18 @@ def main():
                 else:
                     st.error("Contraseña incorrecta")
     
-    # Sección de búsqueda
+
     busqueda_nombre = st.text_input("Buscar por nombre:")
     busqueda_sucursal = st.text_input("Buscar por sucursal:")
     
-    # Filtrado de datos
+
     mask = (
         df["Nombre"].str.contains(busqueda_nombre, case=False) &
         df["Sucursal"].str.contains(busqueda_sucursal, case=False)
     )
     df_filtrado = df[mask].copy()
     
-    # Mostrar resultados
+
     st.dataframe(
         df_filtrado,
         use_container_width=True,
