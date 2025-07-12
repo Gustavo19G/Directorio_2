@@ -52,38 +52,12 @@ def mostrar_login():
         color: #2c3e50;
         margin-bottom: 2rem;
     }
-    .logo-container {
-        text-align: center;
-        margin-bottom: 2rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-    }
-    .logo-container img {
-        max-width: 200px;
-        height: auto;
-        display: block;
-        margin: 0 auto;
-    }
     .credentials-info {
         background: #e3f2fd;
         padding: 1rem;
         border-radius: 5px;
         margin-top: 1rem;
         font-size: 0.9rem;
-    }
-    .stImage {
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .stImage > div {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -93,39 +67,15 @@ def mostrar_login():
         with col2:
             st.markdown('<div class="login-container">', unsafe_allow_html=True)
             
-            # Logo centrado en la pantalla de login
-            st.markdown('<div class="logo-container">', unsafe_allow_html=True)
-            try:
-                if os.path.exists("tamex.png"):
-                    # Usando HTML para mayor control del centrado
-                    with open("tamex.png", "rb") as file:
-                        import base64
-                        logo_base64 = base64.b64encode(file.read()).decode()
-                        st.markdown(f"""
-                        <div style="text-align: center; width: 100%; display: flex; justify-content: center; align-items: center; margin-bottom: 1rem;">
-                            <img src="data:image/png;base64,{logo_base64}" style="max-width: 200px; height: auto; display: block; margin: 0 auto;">
-                        </div>
-                        """, unsafe_allow_html=True)
-                else:
-                    # Alternativa si no se puede cargar como base64
+            # Logo centrado - solo si existe el archivo
+            if os.path.exists("tamex.png"):
+                try:
                     col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
                     with col_logo2:
-                        if os.path.exists("tamex.png"):
-                            st.image("tamex.png", width=200)
-                        else:
-                            st.info("Logo tamex.png no encontrado")
-            except Exception as e:
-                # Método alternativo más simple
-                try:
-                    if os.path.exists("tamex.png"):
-                        col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
-                        with col_logo2:
-                            st.image("tamex.png", width=200)
-                    else:
-                        st.info("Logo tamex.png no encontrado")
-                except Exception as e2:
-                    st.warning(f"Error al cargar el logo: {str(e2)}")
-            st.markdown('</div>', unsafe_allow_html=True)
+                        st.image("tamex.png", width=200)
+                except Exception:
+                    # Si hay error al cargar, continuamos sin mostrar nada
+                    pass
             
             st.markdown('<h2 class="login-title">🔐 Acceso al Directorio Tamex</h2>', unsafe_allow_html=True)
             
@@ -267,13 +217,12 @@ def mostrar_header():
     col_logo, col_header, col_user = st.columns([1, 3, 2])
     
     with col_logo:
-        try:
-            if os.path.exists("tamex.png"):
+        if os.path.exists("tamex.png"):
+            try:
                 st.image("tamex.png", width=100)
-            else:
-                st.info("Logo tamex.png no encontrado")
-        except Exception as e:
-            st.warning(f"Error al cargar el logo: {str(e)}")
+            except Exception:
+                # Si hay error al cargar, no mostramos nada
+                pass
     
     with col_header:
         st.markdown('<h2 style="color: #2c3e50; margin-top: 20px;">📞 Directorio Telefónico Tamex</h2>', unsafe_allow_html=True)
