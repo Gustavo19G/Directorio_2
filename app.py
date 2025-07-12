@@ -4,14 +4,14 @@ import os
 import hashlib
 from io import BytesIO
 
-# Configuración de la página
+
 st.set_page_config(
     page_title="Directorio Telefónico Tamex",
     page_icon="📞",
     layout="wide"
 )
 
-# Credenciales de usuarios (en producción, esto debería estar en una base de datos)
+
 USUARIOS = {
     "admin": {"password": "admin123", "role": "administrador"},
     "usuario": {"password": "user123", "role": "usuario"},
@@ -19,14 +19,14 @@ USUARIOS = {
     "empleado": {"password": "empleado123", "role": "usuario"}
 }
 
-# Función para verificar credenciales
+
 def verificar_credenciales(username, password):
     if username in USUARIOS:
         if USUARIOS[username]["password"] == password:
             return USUARIOS[username]["role"]
     return None
 
-# Función para inicializar el estado de sesión
+
 def inicializar_sesion():
     if 'authenticated' not in st.session_state:
         st.session_state.authenticated = False
@@ -35,7 +35,7 @@ def inicializar_sesion():
     if 'username' not in st.session_state:
         st.session_state.username = None
 
-# Función para mostrar pantalla de login
+
 def mostrar_login():
     st.markdown("""
     <style>
@@ -95,7 +95,7 @@ def mostrar_login():
                     else:
                         st.error("❌ Por favor ingrese usuario y contraseña")
             
-            # Información de credenciales de prueba
+   
             st.markdown("""
             <div class="credentials-info">
                 <strong>📋 Credenciales de prueba:</strong><br>
@@ -110,13 +110,13 @@ def mostrar_login():
             
             st.markdown('</div>', unsafe_allow_html=True)
 
-# Función para cargar datos con validación robusta
+
 @st.cache_data
 def cargar_datos():
     try:
         if not os.path.exists("Directorio2.xlsx"):
             st.warning("Archivo 'Directorio2.xlsx' no encontrado. Usando datos de ejemplo.")
-            # Datos de ejemplo si no existe el archivo
+    
             return pd.DataFrame({
                 "Nombre": ["Juan Pérez", "María González", "Carlos Rodríguez", "Ana López", "Pedro Martínez"],
                 "Correo Electrónico": ["juan.perez@tamex.com", "maria.gonzalez@tamex.com", "carlos.rodriguez@tamex.com", "ana.lopez@tamex.com", "pedro.martinez@tamex.com"],
