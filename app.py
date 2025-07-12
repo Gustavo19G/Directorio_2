@@ -52,13 +52,6 @@ def mostrar_login():
         color: #2c3e50;
         margin-bottom: 2rem;
     }
-    .credentials-info {
-        background: #e3f2fd;
-        padding: 1rem;
-        border-radius: 5px;
-        margin-top: 1rem;
-        font-size: 0.9rem;
-    }
     /* Ocultar elementos vacíos que puedan causar recuadros blancos */
     .stImage {
         display: none !important;
@@ -101,18 +94,6 @@ def mostrar_login():
                             st.error("❌ Usuario o contraseña incorrectos")
                     else:
                         st.error("❌ Por favor ingrese usuario y contraseña")
-            
-            st.markdown("""
-            <div class="credentials-info">
-                <strong>📋 Credenciales de prueba:</strong><br>
-                <strong>Usuarios normales:</strong><br>
-                • usuario / user123<br>
-                • empleado / empleado123<br><br>
-                <strong>Administradores:</strong><br>
-                • admin / admin123<br>
-                • tamex_admin / tamex2024
-            </div>
-            """, unsafe_allow_html=True)
             
             st.markdown('</div>', unsafe_allow_html=True)
 
