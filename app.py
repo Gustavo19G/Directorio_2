@@ -82,7 +82,7 @@ def mostrar_login():
                     if username and password:
                         role = verificar_credenciales(username, password)
                         if role:
-                    
+      
                             if (submit_usuario and role == "usuario") or (submit_admin and role == "administrador"):
                                 st.session_state.authenticated = True
                                 st.session_state.user_role = role
@@ -133,12 +133,12 @@ def cargar_datos():
         )
 
         required_columns = ["Nombre", "Correo Electrónico", "Sucursal", "Extensión"]
- 
+      
         if "Puesto" not in df.columns:
             df["Puesto"] = ""
             st.info("ℹ️ Se agregó la columna 'Puesto' al directorio")
         
-    
+
         column_order = ["Nombre", "Correo Electrónico", "Puesto", "Sucursal", "Extensión"]
         df = df.reindex(columns=column_order, fill_value="")
         
@@ -228,24 +228,21 @@ def interfaz_usuario(df):
     st.markdown("### 📋 Consulta de Directorio")
     
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     with col1:
         busqueda_nombre = st.text_input("🔍 Buscar por nombre:", key="search_name")
     with col2:
-        busqueda_puesto = st.text_input("💼 Buscar por puesto:", key="search_position")
-    with col3:
         busqueda_sucursal = st.text_input("🏢 Buscar por sucursal:", key="search_branch")
     
-
+  
     if not df.empty:
         mask = (
             df["Nombre"].str.contains(busqueda_nombre, case=False, na=False) &
-            df["Puesto"].str.contains(busqueda_puesto, case=False, na=False) &
             df["Sucursal"].str.contains(busqueda_sucursal, case=False, na=False)
         )
         df_filtrado = df[mask].copy()
         
-
+   
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("👥 Total de Contactos", len(df))
@@ -254,7 +251,7 @@ def interfaz_usuario(df):
         with col3:
             st.metric("🏢 Sucursales", df["Sucursal"].nunique())
         
-    
+ 
         st.dataframe(
             df_filtrado,
             use_container_width=True,
@@ -282,7 +279,7 @@ def interfaz_administrador(df):
     with tab2:
         st.markdown("### 📝 Gestión de Contactos")
         
- 
+  
         with st.expander("➕ Agregar Nuevo Contacto", expanded=False):
             with st.form("add_contact_form"):
                 col1, col2 = st.columns(2)
@@ -310,11 +307,11 @@ def interfaz_administrador(df):
                     else:
                         st.error("❌ Por favor complete al menos los campos obligatorios: Nombre, Correo, Sucursal y Extensión")
         
-  
+   
         if not df.empty:
             st.markdown("### 📊 Datos Actuales")
             
-  
+      
             if len(df) > 0:
                 with st.expander("✏️ Editar Contacto Existente"):
                     selected_index = st.selectbox(
@@ -354,7 +351,7 @@ def interfaz_administrador(df):
                                     if guardar_datos(df_actualizado):
                                         st.info("🔄 Recargue la página para ver los cambios")
             
-
+   
             st.dataframe(
                 df,
                 use_container_width=True,
@@ -385,12 +382,12 @@ def interfaz_administrador(df):
                         new_df = pd.read_excel(uploaded_file, engine="openpyxl", dtype=str)
                         required_columns = ["Nombre", "Correo Electrónico", "Sucursal", "Extensión"]
                         
-                      
+           
                         if "Puesto" not in new_df.columns:
                             new_df["Puesto"] = ""
                             st.info("ℹ️ Se agregó la columna 'Puesto' al archivo importado")
                         
-        
+       
                         column_order = ["Nombre", "Correo Electrónico", "Puesto", "Sucursal", "Extensión"]
                         new_df = new_df.reindex(columns=column_order, fill_value="")
                         
@@ -403,10 +400,10 @@ def interfaz_administrador(df):
                     except Exception as e:
                         st.error(f"❌ Error al procesar archivo: {str(e)}")
         
-  
+
         with st.expander("📤 Exportar Datos"):
             if not df.empty:
-    
+      
                 from io import BytesIO
                 excel_buffer = BytesIO()
                 df.to_excel(excel_buffer, index=False, engine='openpyxl')
@@ -425,17 +422,17 @@ def interfaz_administrador(df):
 def main():
     inicializar_sesion()
     
- 
+
     if not st.session_state.authenticated:
         mostrar_login()
     else:
-    
+
         mostrar_header()
         
-  
+
         df = cargar_datos()
         
-  
+
         if st.session_state.user_role == "usuario":
             interfaz_usuario(df)
         elif st.session_state.user_role == "administrador":
