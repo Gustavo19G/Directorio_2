@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 import hashlib
+from io import BytesIO
 
 # Configuración de la página
 st.set_page_config(
@@ -146,9 +147,10 @@ def cargar_datos():
         st.error(f"Error al cargar el archivo: {str(e)}")
         return pd.DataFrame(columns=["Nombre", "Correo Electrónico", "Sucursal", "Extensión"])
 
-# Función para guardar datos
+
 def guardar_datos(df):
     try:
+
         df.to_excel(
             "Directorio2.xlsx",
             index=False,
@@ -162,7 +164,7 @@ def guardar_datos(df):
         st.error(f"❌ Error al guardar el archivo: {str(e)}")
         return False
 
-# Función para mostrar header con información del usuario
+
 def mostrar_header():
     st.markdown("""
     <style>
@@ -212,18 +214,18 @@ def mostrar_header():
             st.session_state.username = None
             st.rerun()
 
-# Función para la interfaz de usuario normal
+
 def interfaz_usuario(df):
     st.markdown("### 📋 Consulta de Directorio")
     
-    # Sección de búsqueda
+
     col1, col2 = st.columns(2)
     with col1:
         busqueda_nombre = st.text_input("🔍 Buscar por nombre:", key="search_name")
     with col2:
         busqueda_sucursal = st.text_input("🏢 Buscar por sucursal:", key="search_branch")
     
-    # Filtrado de datos
+
     if not df.empty:
         mask = (
             df["Nombre"].str.contains(busqueda_nombre, case=False, na=False) &
@@ -231,7 +233,7 @@ def interfaz_usuario(df):
         )
         df_filtrado = df[mask].copy()
         
-        # Mostrar estadísticas
+
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("👥 Total de Contactos", len(df))
@@ -240,7 +242,7 @@ def interfaz_usuario(df):
         with col3:
             st.metric("🏢 Sucursales", df["Sucursal"].nunique())
         
-        # Mostrar resultados
+    
         st.dataframe(
             df_filtrado,
             use_container_width=True,
@@ -255,19 +257,19 @@ def interfaz_usuario(df):
     else:
         st.info("ℹ️ No hay datos para mostrar")
 
-# Función para la interfaz de administrador
+
 def interfaz_administrador(df):
-    # Crear tabs para diferentes funciones
+
     tab1, tab2, tab3 = st.tabs(["📋 Consulta", "📝 Gestión de Datos", "📁 Administración de Archivos"])
     
     with tab1:
-        # Misma funcionalidad que el usuario normal
+
         interfaz_usuario(df)
     
     with tab2:
         st.markdown("### 📝 Gestión de Contactos")
         
-        # Formulario para agregar/editar contactos
+
         with st.expander("➕ Agregar Nuevo Contacto", expanded=False):
             with st.form("add_contact_form"):
                 col1, col2 = st.columns(2)
@@ -288,16 +290,16 @@ def interfaz_administrador(df):
                         })
                         df_actualizado = pd.concat([df, nuevo_contacto], ignore_index=True)
                         if guardar_datos(df_actualizado):
-                            st.success("✅ Contacto agregado exitosamente")
-                            st.rerun()
+                            st.balloons()
+                            st.info("🔄 Recargue la página para ver los cambios")
                     else:
                         st.error("❌ Por favor complete todos los campos")
         
-        # Mostrar datos actuales con opción de editar
+
         if not df.empty:
             st.markdown("### 📊 Datos Actuales")
             
-            # Seleccionar registro para editar
+
             if len(df) > 0:
                 with st.expander("✏️ Editar Contacto Existente"):
                     selected_index = st.selectbox(
@@ -326,17 +328,16 @@ def interfaz_administrador(df):
                                     df.loc[selected_index, "Sucursal"] = sucursal_edit
                                     df.loc[selected_index, "Extensión"] = extension_edit
                                     if guardar_datos(df):
-                                        st.success("✅ Contacto actualizado exitosamente")
-                                        st.rerun()
+                                        st.balloons()
+                                        st.info("🔄 Recargue la página para ver los cambios")
                             
                             with col_btn2:
                                 if st.form_submit_button("🗑️ Eliminar Contacto", type="secondary"):
                                     df_actualizado = df.drop(selected_index).reset_index(drop=True)
                                     if guardar_datos(df_actualizado):
-                                        st.success("✅ Contacto eliminado exitosamente")
-                                        st.rerun()
+                                        st.info("🔄 Recargue la página para ver los cambios")
             
-            # Mostrar tabla completa
+
             st.dataframe(
                 df,
                 use_container_width=True,
@@ -352,7 +353,7 @@ def interfaz_administrador(df):
     with tab3:
         st.markdown("### 📁 Administración de Archivos")
         
-        # Subir nuevo archivo
+  
         with st.expander("📤 Subir Archivo de Reemplazo"):
             uploaded_file = st.file_uploader(
                 "Seleccione archivo Excel",
@@ -368,18 +369,22 @@ def interfaz_administrador(df):
                         
                         if all(col in new_df.columns for col in required_columns):
                             if guardar_datos(new_df):
-                                st.success("✅ Directorio actualizado exitosamente")
-                                st.rerun()
+                                st.balloons()
+                                st.info("🔄 Recargue la página para ver los cambios")
                         else:
                             st.error(f"❌ El archivo debe contener las columnas: {', '.join(required_columns)}")
                     except Exception as e:
                         st.error(f"❌ Error al procesar archivo: {str(e)}")
         
-        # Exportar datos
+ 
         with st.expander("📤 Exportar Datos"):
             if not df.empty:
-                # Convertir a Excel para descarga
-                excel_data = df.to_excel(index=False, engine='openpyxl')
+
+                from io import BytesIO
+                excel_buffer = BytesIO()
+                df.to_excel(excel_buffer, index=False, engine='openpyxl')
+                excel_data = excel_buffer.getvalue()
+                
                 st.download_button(
                     label="📥 Descargar Directorio Actual",
                     data=excel_data,
@@ -389,21 +394,21 @@ def interfaz_administrador(df):
             else:
                 st.info("ℹ️ No hay datos para exportar")
 
-# Función principal
+
 def main():
     inicializar_sesion()
     
-    # Verificar si el usuario está autenticado
+
     if not st.session_state.authenticated:
         mostrar_login()
     else:
-        # Mostrar header con información del usuario
+
         mostrar_header()
         
         # Cargar datos
         df = cargar_datos()
         
-        # Mostrar interfaz según el rol
+
         if st.session_state.user_role == "usuario":
             interfaz_usuario(df)
         elif st.session_state.user_role == "administrador":
