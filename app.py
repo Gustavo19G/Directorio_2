@@ -59,6 +59,13 @@ def mostrar_login():
         margin-top: 1rem;
         font-size: 0.9rem;
     }
+    /* Ocultar elementos vacíos que puedan causar recuadros blancos */
+    .stImage {
+        display: none !important;
+    }
+    .element-container:has(.stImage) {
+        display: none !important;
+    }
     </style>
     """, unsafe_allow_html=True)
     
@@ -66,16 +73,6 @@ def mostrar_login():
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             st.markdown('<div class="login-container">', unsafe_allow_html=True)
-            
-            # Logo centrado - solo si existe el archivo
-            if os.path.exists("tamex.png"):
-                try:
-                    col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
-                    with col_logo2:
-                        st.image("tamex.png", width=200)
-                except Exception:
-                    # Si hay error al cargar, continuamos sin mostrar nada
-                    pass
             
             st.markdown('<h2 class="login-title">🔐 Acceso al Directorio Tamex</h2>', unsafe_allow_html=True)
             
