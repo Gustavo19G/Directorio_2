@@ -41,7 +41,7 @@ def mostrar_login():
     <style>
     .login-container {
         max-width: 400px;
-        margin: 50px auto;
+        margin: 20px auto;
         padding: 2rem;
         background: #f8f9fa;
         border-radius: 10px;
@@ -52,12 +52,37 @@ def mostrar_login():
         color: #2c3e50;
         margin-bottom: 2rem;
     }
+    .logo-container {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .responsive-logo {
+        max-width: 100%;
+        height: auto;
+        max-height: 150px;
+    }
     .credentials-info {
         background: #e3f2fd;
         padding: 1rem;
         border-radius: 5px;
         margin-top: 1rem;
         font-size: 0.9rem;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .login-container {
+            max-width: 90%;
+            margin: 10px auto;
+            padding: 1rem;
+        }
+        .responsive-logo {
+            max-height: 100px;
+        }
+    }
+    @media (max-width: 480px) {
+        .responsive-logo {
+            max-height: 80px;
+        }
     }
     </style>
     """, unsafe_allow_html=True)
@@ -66,6 +91,18 @@ def mostrar_login():
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             st.markdown('<div class="login-container">', unsafe_allow_html=True)
+            
+            # Logo en la pantalla de login - Responsive
+            st.markdown('<div class="logo-container">', unsafe_allow_html=True)
+            try:
+                if os.path.exists("tamex.png"):
+                    st.image("tamex.png", use_column_width=True)
+                else:
+                    st.info("Logo tamex.png no encontrado")
+            except Exception as e:
+                st.warning(f"Error al cargar el logo: {str(e)}")
+            st.markdown('</div>', unsafe_allow_html=True)
+            
             st.markdown('<h2 class="login-title">🔐 Acceso al Directorio Tamex</h2>', unsafe_allow_html=True)
             
             with st.form("login_form"):
@@ -82,7 +119,6 @@ def mostrar_login():
                     if username and password:
                         role = verificar_credenciales(username, password)
                         if role:
-      
                             if (submit_usuario and role == "usuario") or (submit_admin and role == "administrador"):
                                 st.session_state.authenticated = True
                                 st.session_state.user_role = role
@@ -95,7 +131,6 @@ def mostrar_login():
                     else:
                         st.error("❌ Por favor ingrese usuario y contraseña")
             
-   
             st.markdown("""
             <div class="credentials-info">
                 <strong>📋 Credenciales de prueba:</strong><br>
@@ -116,7 +151,6 @@ def cargar_datos():
     try:
         if not os.path.exists("Directorio2.xlsx"):
             st.warning("Archivo 'Directorio2.xlsx' no encontrado. Usando datos de ejemplo.")
-    
             return pd.DataFrame({
                 "Nombre": ["Juan Pérez", "María González", "Carlos Rodríguez", "Ana López", "Pedro Martínez"],
                 "Correo Electrónico": ["juan.perez@tamex.com", "maria.gonzalez@tamex.com", "carlos.rodriguez@tamex.com", "ana.lopez@tamex.com", "pedro.martinez@tamex.com"],
@@ -133,12 +167,11 @@ def cargar_datos():
         )
 
         required_columns = ["Nombre", "Correo Electrónico", "Sucursal", "Extensión"]
-      
+        
         if "Puesto" not in df.columns:
             df["Puesto"] = ""
             st.info("ℹ️ Se agregó la columna 'Puesto' al directorio")
         
-
         column_order = ["Nombre", "Correo Electrónico", "Puesto", "Sucursal", "Extensión"]
         df = df.reindex(columns=column_order, fill_value="")
         
@@ -198,26 +231,97 @@ def mostrar_header():
         border-radius: 15px;
         font-size: 0.8rem;
     }
+    .header-logo {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .header-responsive {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .header-title {
+        color: #2c3e50;
+        margin: 0;
+        flex-grow: 1;
+    }
+    .user-section {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+    .user-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .header-responsive {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+        .header-title {
+            font-size: 1.2rem;
+        }
+        .user-content {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+    @media (max-width: 480px) {
+        .header-title {
+            font-size: 1rem;
+        }
+        .user-section {
+            padding: 0.5rem;
+        }
+    }
     </style>
     """, unsafe_allow_html=True)
     
-    col1, col2 = st.columns([3, 1])
-    with col1:
+    # Header responsive con logo
+    st.markdown('<div class="header-responsive">', unsafe_allow_html=True)
+    
+    col_logo, col_header = st.columns([1, 4])
+    
+    with col_logo:
+        try:
+            if os.path.exists("tamex.png"):
+                st.image("tamex.png", use_column_width=True)
+            else:
+                st.info("Logo tamex.png no encontrado")
+        except Exception as e:
+            st.warning(f"Error al cargar el logo: {str(e)}")
+    
+    with col_header:
+        st.markdown('<h2 class="header-title">📞 Directorio Telefónico Tamex</h2>', unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Sección de usuario responsive
+    col_user, col_btn = st.columns([3, 1])
+    
+    with col_user:
         role_display = "👤 Usuario" if st.session_state.user_role == "usuario" else "🔧 Administrador"
         st.markdown(f"""
-        <div class="user-header">
-            <div>
-                <h2>📞 Directorio Telefónico Tamex</h2>
-            </div>
-            <div class="user-info">
+        <div class="user-section">
+            <div class="user-content">
                 <span>Bienvenido: <strong>{st.session_state.username}</strong></span>
-                <span class="user-role">{role_display}</span>
+                <span style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">{role_display}</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
-    
-    with col2:
-        if st.button("🚪 Cerrar Sesión", type="secondary"):
+        
+    with col_btn:
+        if st.button("🚪 Cerrar Sesión", type="secondary", use_container_width=True):
             st.session_state.authenticated = False
             st.session_state.user_role = None
             st.session_state.username = None
@@ -227,14 +331,12 @@ def mostrar_header():
 def interfaz_usuario(df):
     st.markdown("### 📋 Consulta de Directorio")
     
-
     col1, col2 = st.columns(2)
     with col1:
         busqueda_nombre = st.text_input("🔍 Buscar por nombre:", key="search_name")
     with col2:
         busqueda_sucursal = st.text_input("🏢 Buscar por sucursal:", key="search_branch")
     
-  
     if not df.empty:
         mask = (
             df["Nombre"].str.contains(busqueda_nombre, case=False, na=False) &
@@ -242,7 +344,6 @@ def interfaz_usuario(df):
         )
         df_filtrado = df[mask].copy()
         
-   
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("👥 Total de Contactos", len(df))
@@ -251,7 +352,6 @@ def interfaz_usuario(df):
         with col3:
             st.metric("🏢 Sucursales", df["Sucursal"].nunique())
         
- 
         st.dataframe(
             df_filtrado,
             use_container_width=True,
@@ -269,17 +369,14 @@ def interfaz_usuario(df):
 
 
 def interfaz_administrador(df):
-
     tab1, tab2, tab3 = st.tabs(["📋 Consulta", "📝 Gestión de Datos", "📁 Administración de Archivos"])
     
     with tab1:
-
         interfaz_usuario(df)
     
     with tab2:
         st.markdown("### 📝 Gestión de Contactos")
         
-  
         with st.expander("➕ Agregar Nuevo Contacto", expanded=False):
             with st.form("add_contact_form"):
                 col1, col2 = st.columns(2)
@@ -307,11 +404,9 @@ def interfaz_administrador(df):
                     else:
                         st.error("❌ Por favor complete al menos los campos obligatorios: Nombre, Correo, Sucursal y Extensión")
         
-   
         if not df.empty:
             st.markdown("### 📊 Datos Actuales")
             
-      
             if len(df) > 0:
                 with st.expander("✏️ Editar Contacto Existente"):
                     selected_index = st.selectbox(
@@ -351,7 +446,6 @@ def interfaz_administrador(df):
                                     if guardar_datos(df_actualizado):
                                         st.info("🔄 Recargue la página para ver los cambios")
             
-   
             st.dataframe(
                 df,
                 use_container_width=True,
@@ -368,7 +462,6 @@ def interfaz_administrador(df):
     with tab3:
         st.markdown("### 📁 Administración de Archivos")
         
-
         with st.expander("📤 Subir Archivo de Reemplazo"):
             uploaded_file = st.file_uploader(
                 "Seleccione archivo Excel",
@@ -382,12 +475,10 @@ def interfaz_administrador(df):
                         new_df = pd.read_excel(uploaded_file, engine="openpyxl", dtype=str)
                         required_columns = ["Nombre", "Correo Electrónico", "Sucursal", "Extensión"]
                         
-           
                         if "Puesto" not in new_df.columns:
                             new_df["Puesto"] = ""
                             st.info("ℹ️ Se agregó la columna 'Puesto' al archivo importado")
                         
-       
                         column_order = ["Nombre", "Correo Electrónico", "Puesto", "Sucursal", "Extensión"]
                         new_df = new_df.reindex(columns=column_order, fill_value="")
                         
@@ -400,10 +491,8 @@ def interfaz_administrador(df):
                     except Exception as e:
                         st.error(f"❌ Error al procesar archivo: {str(e)}")
         
-
         with st.expander("📤 Exportar Datos"):
             if not df.empty:
-      
                 from io import BytesIO
                 excel_buffer = BytesIO()
                 df.to_excel(excel_buffer, index=False, engine='openpyxl')
@@ -422,17 +511,12 @@ def interfaz_administrador(df):
 def main():
     inicializar_sesion()
     
-
     if not st.session_state.authenticated:
         mostrar_login()
     else:
-
         mostrar_header()
-        
-
         df = cargar_datos()
         
-
         if st.session_state.user_role == "usuario":
             interfaz_usuario(df)
         elif st.session_state.user_role == "administrador":
