@@ -58,11 +58,11 @@ def mostrar_login():
         display: flex;
         justify-content: center;
         align-items: center;
+        width: 100%;
     }
-    .responsive-logo {
-        max-width: 100%;
+    .logo-container img {
+        max-width: 200px;
         height: auto;
-        max-height: 150px;
         display: block;
         margin: 0 auto;
     }
@@ -73,21 +73,17 @@ def mostrar_login():
         margin-top: 1rem;
         font-size: 0.9rem;
     }
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .login-container {
-            max-width: 90%;
-            margin: 10px auto;
-            padding: 1rem;
-        }
-        .responsive-logo {
-            max-height: 100px;
-        }
+    .stImage {
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
-    @media (max-width: 480px) {
-        .responsive-logo {
-            max-height: 80px;
-        }
+    .stImage > div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -97,18 +93,38 @@ def mostrar_login():
         with col2:
             st.markdown('<div class="login-container">', unsafe_allow_html=True)
             
-            # Logo en la pantalla de login - Centrado y Responsive
+            # Logo centrado en la pantalla de login
             st.markdown('<div class="logo-container">', unsafe_allow_html=True)
             try:
                 if os.path.exists("tamex.png"):
-                    # Usar contenedor centrado para el logo
-                    logo_col1, logo_col2, logo_col3 = st.columns([1, 2, 1])
-                    with logo_col2:
-                        st.image("tamex.png", use_column_width=True)
+                    # Usando HTML para mayor control del centrado
+                    with open("tamex.png", "rb") as file:
+                        import base64
+                        logo_base64 = base64.b64encode(file.read()).decode()
+                        st.markdown(f"""
+                        <div style="text-align: center; width: 100%; display: flex; justify-content: center; align-items: center; margin-bottom: 1rem;">
+                            <img src="data:image/png;base64,{logo_base64}" style="max-width: 200px; height: auto; display: block; margin: 0 auto;">
+                        </div>
+                        """, unsafe_allow_html=True)
                 else:
-                    st.info("Logo tamex.png no encontrado")
+                    # Alternativa si no se puede cargar como base64
+                    col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
+                    with col_logo2:
+                        if os.path.exists("tamex.png"):
+                            st.image("tamex.png", width=200)
+                        else:
+                            st.info("Logo tamex.png no encontrado")
             except Exception as e:
-                st.warning(f"Error al cargar el logo: {str(e)}")
+                # Método alternativo más simple
+                try:
+                    if os.path.exists("tamex.png"):
+                        col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
+                        with col_logo2:
+                            st.image("tamex.png", width=200)
+                    else:
+                        st.info("Logo tamex.png no encontrado")
+                except Exception as e2:
+                    st.warning(f"Error al cargar el logo: {str(e2)}")
             st.markdown('</div>', unsafe_allow_html=True)
             
             st.markdown('<h2 class="login-title">🔐 Acceso al Directorio Tamex</h2>', unsafe_allow_html=True)
@@ -244,91 +260,35 @@ def mostrar_header():
         align-items: center;
         gap: 1rem;
     }
-    .header-responsive {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-    .header-title {
-        color: #2c3e50;
-        margin: 0;
-        flex-grow: 1;
-    }
-    .user-section {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 1rem;
-        border-radius: 10px;
-        margin-top: 10px;
-    }
-    .user-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .header-responsive {
-            flex-direction: column;
-            text-align: center;
-            gap: 0.5rem;
-        }
-        .header-title {
-            font-size: 1.2rem;
-        }
-        .user-content {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-    }
-    @media (max-width: 480px) {
-        .header-title {
-            font-size: 1rem;
-        }
-        .user-section {
-            padding: 0.5rem;
-        }
-    }
     </style>
     """, unsafe_allow_html=True)
     
-    # Header responsive con logo
-    st.markdown('<div class="header-responsive">', unsafe_allow_html=True)
-    
-    col_logo, col_header = st.columns([1, 4])
+    # Logo en el header del directorio
+    col_logo, col_header, col_user = st.columns([1, 3, 2])
     
     with col_logo:
         try:
             if os.path.exists("tamex.png"):
-                st.image("tamex.png", use_column_width=True)
+                st.image("tamex.png", width=100)
             else:
                 st.info("Logo tamex.png no encontrado")
         except Exception as e:
             st.warning(f"Error al cargar el logo: {str(e)}")
     
     with col_header:
-        st.markdown('<h2 class="header-title">📞 Directorio Telefónico Tamex</h2>', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Sección de usuario responsive
-    col_user, col_btn = st.columns([3, 1])
+        st.markdown('<h2 style="color: #2c3e50; margin-top: 20px;">📞 Directorio Telefónico Tamex</h2>', unsafe_allow_html=True)
     
     with col_user:
         role_display = "👤 Usuario" if st.session_state.user_role == "usuario" else "🔧 Administrador"
         st.markdown(f"""
-        <div class="user-section">
-            <div class="user-content">
+        <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 10px; margin-top: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span>Bienvenido: <strong>{st.session_state.username}</strong></span>
                 <span style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">{role_display}</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
         
-    with col_btn:
         if st.button("🚪 Cerrar Sesión", type="secondary", use_container_width=True):
             st.session_state.authenticated = False
             st.session_state.user_role = None
