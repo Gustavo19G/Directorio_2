@@ -572,7 +572,6 @@ def main():
     if not st.session_state.authenticated:
         mostrar_login()
     else:
-        # Aplicar fondo traslúcido solo después del login
         aplicar_fondo_traslucido()
         mostrar_header()
         df = cargar_datos()
