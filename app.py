@@ -56,12 +56,11 @@ def mostrar_login():
         text-align: center;
         margin-bottom: 2rem;
     }
-    /* Ocultar elementos vacíos que puedan causar recuadros blancos */
-    .stImage {
-        display: none !important;
+    .logo-container .stImage {
+        display: block !important;
     }
-    .element-container:has(.stImage) {
-        display: none !important;
+    .logo-container .element-container {
+        display: block !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -72,17 +71,18 @@ def mostrar_login():
             st.markdown('<div class="login-container">', unsafe_allow_html=True)
             
             # Logo centrado
-            st.markdown('<div class="logo-container">', unsafe_allow_html=True)
-            if os.path.exists("tamex.png"):
-                try:
-                    st.image("tamex.png", width=200)
-                except Exception:
-                    # Si hay error al cargar el logo, mostramos un emoji como alternativa
-                    st.markdown('<div style="font-size: 4rem; text-align: center;">🏢</div>', unsafe_allow_html=True)
-            else:
-                # Si no existe el archivo, mostramos un emoji como alternativa
-                st.markdown('<div style="font-size: 4rem; text-align: center;">🏢</div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+            with st.container():
+                col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
+                with col_logo2:
+                    if os.path.exists("tamex.png"):
+                        try:
+                            st.image("tamex.png", width=200)
+                        except Exception as e:
+                            st.error(f"Error al cargar logo: {e}")
+                            st.markdown('<div style="font-size: 4rem; text-align: center;">🏢</div>', unsafe_allow_html=True)
+                    else:
+                        st.warning("Archivo tamex.png no encontrado")
+                        st.markdown('<div style="font-size: 4rem; text-align: center;">🏢</div>', unsafe_allow_html=True)
             
             st.markdown('<h2 class="login-title">🔐 Acceso al Directorio Tamex</h2>', unsafe_allow_html=True)
             
