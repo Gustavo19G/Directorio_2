@@ -111,21 +111,57 @@ def mostrar_login():
         with col2:
             st.markdown('<div class="login-container">', unsafe_allow_html=True)
             
-            # Logo centrado
-            st.markdown('<div class="logo-container">', unsafe_allow_html=True)
+def mostrar_login():
+    st.markdown("""
+    <style>
+    .login-container {
+        max-width: 400px;
+        margin: 20px auto;
+        padding: 2rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .login-title {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 2rem;
+    }
+    .centered-logo {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .centered-logo img {
+        max-width: 200px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    with st.container():
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown('<div class="login-container">', unsafe_allow_html=True)
+            
+            # Logo centrado usando HTML directo
             if os.path.exists("tamex.png"):
                 try:
-                    # Crear columnas para centrar perfectamente el logo
-                    col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
-                    with col_logo2:
-                        st.image("tamex.png", width=200)
+                    # Convertir imagen a base64 para insertarla directamente en HTML
+                    import base64
+                    with open("tamex.png", "rb") as img_file:
+                        img_base64 = base64.b64encode(img_file.read()).decode()
+                    
+                    st.markdown(f'''
+                    <div class="centered-logo">
+                        <img src="data:image/png;base64,{img_base64}" alt="Logo Tamex">
+                    </div>
+                    ''', unsafe_allow_html=True)
                 except Exception as e:
-                    st.error(f"Error al cargar logo: {e}")
-                    st.markdown('<div style="font-size: 4rem; text-align: center;">🏢</div>', unsafe_allow_html=True)
+                    st.markdown('<div style="text-align: center; margin-bottom: 2rem;"><div style="font-size: 4rem;">🏢</div></div>', unsafe_allow_html=True)
             else:
-                st.warning("Archivo tamex.png no encontrado")
-                st.markdown('<div style="font-size: 4rem; text-align: center;">🏢</div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown('<div style="text-align: center; margin-bottom: 2rem;"><div style="font-size: 4rem;">🏢</div></div>', unsafe_allow_html=True)
             
             st.markdown('<h2 class="login-title">🔐 Acceso al Directorio Tamex</h2>', unsafe_allow_html=True)
             
