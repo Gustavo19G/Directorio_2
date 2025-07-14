@@ -407,8 +407,6 @@ def interfaz_usuario(df):
             st.metric("👥 Total de Contactos", len(df))
         with col2:
             st.metric("📊 Resultados Filtrados", len(df_filtrado))
-        with col3:
-            st.metric("🏢 Sucursales", df["Sucursal"].nunique())
         
         st.dataframe(
             df_filtrado,
