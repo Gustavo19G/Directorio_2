@@ -69,11 +69,11 @@ def mostrar_login():
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             
-            if os.path.exists("tamex.png"):
+            if os.path.exists("logo2.png"):
                 try:
                    
                     import base64
-                    with open("tamex.png", "rb") as img_file:
+                    with open("logo2.png", "rb") as img_file:
                         img_base64 = base64.b64encode(img_file.read()).decode()
                     
                     st.markdown(f'''
