@@ -214,7 +214,7 @@ def mostrar_header():
     with col_logo:
         if os.path.exists("logo2.png"):
             try:
-                st.image("logo2.png", width=100)
+                st.image("logo2.png", width=200)
             except Exception:
                 
                 pass
