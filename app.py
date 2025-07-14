@@ -46,71 +46,141 @@ def aplicar_fondo_traslucido():
             
             st.markdown(f"""
             <style>
+            /* Fondo principal */
             .stApp {{
-                background-image: url("data:image/jpeg;base64,{img_base64}");
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-                background-attachment: fixed;
+                background-image: url("data:image/jpeg;base64,{img_base64}") !important;
+                background-size: cover !important;
+                background-position: center !important;
+                background-repeat: no-repeat !important;
+                background-attachment: fixed !important;
             }}
             
-            .stApp > div:first-child {{
-                background-color: rgba(255, 255, 255, 0.85);
-                backdrop-filter: blur(2px);
-                min-height: 100vh;
-            }}
-            
+            /* Contenedor principal con transparencia */
             .main .block-container {{
-                background-color: rgba(255, 255, 255, 0.9);
-                padding: 2rem;
-                border-radius: 15px;
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                margin-top: 1rem;
-                margin-bottom: 1rem;
+                background-color: rgba(255, 255, 255, 0.85) !important;
+                backdrop-filter: blur(8px) !important;
+                -webkit-backdrop-filter: blur(8px) !important;
+                padding: 2rem !important;
+                border-radius: 15px !important;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+                border: 1px solid rgba(255, 255, 255, 0.3) !important;
+                margin: 1rem !important;
             }}
             
-            .stDataFrame {{
-                background-color: rgba(255, 255, 255, 0.95);
-                border-radius: 10px;
-                padding: 1rem;
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            /* Sidebar si existe */
+            .css-1d391kg {{
+                background-color: rgba(255, 255, 255, 0.9) !important;
+                backdrop-filter: blur(10px) !important;
             }}
             
+            /* DataFrames */
+            .stDataFrame > div {{
+                background-color: rgba(255, 255, 255, 0.95) !important;
+                border-radius: 10px !important;
+                padding: 1rem !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+            }}
+            
+            /* Tabs */
             .stTabs [data-baseweb="tab-list"] {{
-                background-color: rgba(255, 255, 255, 0.8);
-                border-radius: 10px;
-                padding: 0.5rem;
-                backdrop-filter: blur(5px);
+                background-color: rgba(255, 255, 255, 0.8) !important;
+                border-radius: 10px !important;
+                padding: 0.5rem !important;
+                backdrop-filter: blur(5px) !important;
             }}
             
-            .stExpander {{
-                background-color: rgba(255, 255, 255, 0.9);
-                border-radius: 10px;
-                border: 1px solid rgba(0, 0, 0, 0.1);
-                backdrop-filter: blur(5px);
+            .stTabs [data-baseweb="tab-panel"] {{
+                background-color: rgba(255, 255, 255, 0.7) !important;
+                border-radius: 10px !important;
+                padding: 1rem !important;
+                margin-top: 1rem !important;
+                backdrop-filter: blur(5px) !important;
             }}
             
+            /* Expanders */
+            .streamlit-expanderHeader {{
+                background-color: rgba(255, 255, 255, 0.9) !important;
+                border-radius: 10px !important;
+                backdrop-filter: blur(5px) !important;
+            }}
+            
+            .streamlit-expanderContent {{
+                background-color: rgba(255, 255, 255, 0.9) !important;
+                border-radius: 0 0 10px 10px !important;
+                backdrop-filter: blur(5px) !important;
+            }}
+            
+            /* Formularios */
             .stForm {{
-                background-color: rgba(255, 255, 255, 0.95);
-                border-radius: 10px;
-                padding: 1rem;
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                background-color: rgba(255, 255, 255, 0.95) !important;
+                border-radius: 10px !important;
+                padding: 1rem !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+                backdrop-filter: blur(5px) !important;
             }}
             
-            .stMetric {{
-                background-color: rgba(255, 255, 255, 0.9);
-                border-radius: 10px;
-                padding: 1rem;
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-                backdrop-filter: blur(5px);
+            /* Métricas */
+            .metric-container {{
+                background-color: rgba(255, 255, 255, 0.9) !important;
+                border-radius: 10px !important;
+                padding: 1rem !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+                backdrop-filter: blur(5px) !important;
+            }}
+            
+            /* Inputs */
+            .stTextInput > div > div > input {{
+                background-color: rgba(255, 255, 255, 0.9) !important;
+                backdrop-filter: blur(5px) !important;
+            }}
+            
+            .stSelectbox > div > div > div {{
+                background-color: rgba(255, 255, 255, 0.9) !important;
+                backdrop-filter: blur(5px) !important;
+            }}
+            
+            /* Botones */
+            .stButton > button {{
+                backdrop-filter: blur(5px) !important;
+            }}
+            
+            /* Alertas y mensajes */
+            .stAlert {{
+                background-color: rgba(255, 255, 255, 0.9) !important;
+                backdrop-filter: blur(5px) !important;
+            }}
+            
+            .stSuccess {{
+                background-color: rgba(212, 237, 218, 0.9) !important;
+                backdrop-filter: blur(5px) !important;
+            }}
+            
+            .stError {{
+                background-color: rgba(248, 215, 218, 0.9) !important;
+                backdrop-filter: blur(5px) !important;
+            }}
+            
+            .stInfo {{
+                background-color: rgba(209, 236, 241, 0.9) !important;
+                backdrop-filter: blur(5px) !important;
+            }}
+            
+            .stWarning {{
+                background-color: rgba(255, 243, 205, 0.9) !important;
+                backdrop-filter: blur(5px) !important;
             }}
             </style>
             """, unsafe_allow_html=True)
+            
+            # Mensaje de confirmación que la imagen se cargó
+            st.success("✅ Fondo aplicado correctamente")
+            
         except Exception as e:
-            # Si hay error cargando la imagen, continúa sin fondo
-            pass
+            st.error(f"❌ Error al cargar la imagen de fondo: {str(e)}")
+            st.info("💡 Asegúrate de que el archivo 'fondo.jpg' esté en la misma carpeta que tu script")
+    else:
+        st.warning("⚠️ No se encontró el archivo 'fondo.jpg'")
+        st.info("💡 Coloca el archivo 'fondo.jpg' en la misma carpeta que tu script para ver el fondo")
 
 
 def mostrar_login():
