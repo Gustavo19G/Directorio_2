@@ -212,9 +212,9 @@ def mostrar_header():
     col_logo, col_header, col_user = st.columns([1, 3, 2])
     
     with col_logo:
-        if os.path.exists("tamex.png"):
+        if os.path.exists("logo2.png"):
             try:
-                st.image("tamex.png", width=100)
+                st.image("logo2.png", width=100)
             except Exception:
                 
                 pass
