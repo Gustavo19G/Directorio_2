@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import hashlib
 from io import BytesIO
+import base64
 
 
 st.set_page_config(
@@ -34,6 +35,82 @@ def inicializar_sesion():
         st.session_state.user_role = None
     if 'username' not in st.session_state:
         st.session_state.username = None
+
+
+def aplicar_fondo_traslucido():
+    """Aplica la imagen de fondo traslúcida después del login"""
+    if os.path.exists("fondo.jpg"):
+        try:
+            with open("fondo.jpg", "rb") as img_file:
+                img_base64 = base64.b64encode(img_file.read()).decode()
+            
+            st.markdown(f"""
+            <style>
+            .stApp {{
+                background-image: url("data:image/jpeg;base64,{img_base64}");
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+            }}
+            
+            .stApp > div:first-child {{
+                background-color: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(2px);
+                min-height: 100vh;
+            }}
+            
+            .main .block-container {{
+                background-color: rgba(255, 255, 255, 0.9);
+                padding: 2rem;
+                border-radius: 15px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+            }}
+            
+            .stDataFrame {{
+                background-color: rgba(255, 255, 255, 0.95);
+                border-radius: 10px;
+                padding: 1rem;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            }}
+            
+            .stTabs [data-baseweb="tab-list"] {{
+                background-color: rgba(255, 255, 255, 0.8);
+                border-radius: 10px;
+                padding: 0.5rem;
+                backdrop-filter: blur(5px);
+            }}
+            
+            .stExpander {{
+                background-color: rgba(255, 255, 255, 0.9);
+                border-radius: 10px;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+                backdrop-filter: blur(5px);
+            }}
+            
+            .stForm {{
+                background-color: rgba(255, 255, 255, 0.95);
+                border-radius: 10px;
+                padding: 1rem;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            }}
+            
+            .stMetric {{
+                background-color: rgba(255, 255, 255, 0.9);
+                border-radius: 10px;
+                padding: 1rem;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                backdrop-filter: blur(5px);
+            }}
+            </style>
+            """, unsafe_allow_html=True)
+        except Exception as e:
+            # Si hay error cargando la imagen, continúa sin fondo
+            pass
 
 
 def mostrar_login():
@@ -188,6 +265,8 @@ def mostrar_header():
         display: flex;
         justify-content: space-between;
         align-items: center;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
     .user-info {
         display: flex;
@@ -225,7 +304,7 @@ def mostrar_header():
     with col_user:
         role_display = "👤 Usuario" if st.session_state.user_role == "usuario" else "🔧 Administrador"
         st.markdown(f"""
-        <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 10px; margin-top: 10px;">
+        <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 10px; margin-top: 10px; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span>Bienvenido: <strong>{st.session_state.username}</strong></span>
                 <span style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">{role_display}</span>
@@ -426,6 +505,8 @@ def main():
     if not st.session_state.authenticated:
         mostrar_login()
     else:
+        # Aplicar fondo traslúcido solo después del login
+        aplicar_fondo_traslucido()
         mostrar_header()
         df = cargar_datos()
         
