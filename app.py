@@ -38,7 +38,6 @@ def inicializar_sesion():
 
 
 def aplicar_fondo_traslucido():
-    """Aplica la imagen de fondo traslúcida después del login"""
     if os.path.exists("fondo.jpg"):
         try:
             with open("fondo.jpg", "rb") as img_file:
@@ -172,8 +171,6 @@ def aplicar_fondo_traslucido():
             </style>
             """, unsafe_allow_html=True)
             
-            # Mensaje de confirmación que la imagen se cargó
-            st.success("✅ Fondo aplicado correctamente")
             
         except Exception as e:
             st.error(f"❌ Error al cargar la imagen de fondo: {str(e)}")
