@@ -68,10 +68,10 @@ def mostrar_login():
     with st.container():
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            # Logo centrado usando HTML directo
+            
             if os.path.exists("tamex.png"):
                 try:
-                    # Convertir imagen a base64 para insertarla directamente en HTML
+                   
                     import base64
                     with open("tamex.png", "rb") as img_file:
                         img_base64 = base64.b64encode(img_file.read()).decode()
@@ -208,7 +208,7 @@ def mostrar_header():
     </style>
     """, unsafe_allow_html=True)
     
-    # Logo en el header del directorio
+    
     col_logo, col_header, col_user = st.columns([1, 3, 2])
     
     with col_logo:
@@ -216,7 +216,7 @@ def mostrar_header():
             try:
                 st.image("tamex.png", width=100)
             except Exception:
-                # Si hay error al cargar, no mostramos nada
+                
                 pass
     
     with col_header:
