@@ -52,6 +52,10 @@ def mostrar_login():
         color: #2c3e50;
         margin-bottom: 2rem;
     }
+    .logo-container {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
     /* Ocultar elementos vacíos que puedan causar recuadros blancos */
     .stImage {
         display: none !important;
@@ -66,6 +70,19 @@ def mostrar_login():
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             st.markdown('<div class="login-container">', unsafe_allow_html=True)
+            
+            # Logo centrado
+            st.markdown('<div class="logo-container">', unsafe_allow_html=True)
+            if os.path.exists("tamex.png"):
+                try:
+                    st.image("tamex.png", width=200)
+                except Exception:
+                    # Si hay error al cargar el logo, mostramos un emoji como alternativa
+                    st.markdown('<div style="font-size: 4rem; text-align: center;">🏢</div>', unsafe_allow_html=True)
+            else:
+                # Si no existe el archivo, mostramos un emoji como alternativa
+                st.markdown('<div style="font-size: 4rem; text-align: center;">🏢</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
             
             st.markdown('<h2 class="login-title">🔐 Acceso al Directorio Tamex</h2>', unsafe_allow_html=True)
             
